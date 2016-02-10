@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "google-auth-library": "^0.9.7",
+    "googleapis": "^2.1.7",
+    "nodemailer": "^2.1.0"
+  }
+}
