@@ -10,6 +10,7 @@ const querystring = require('querystring')
 
 
 const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/fitbit-credentials.json`))
+let profile
 
 function authenticate(code, cb) {
   post(`grant_type=authorization_code&code=${code}&client_id=${credentials.client_id}&redirect_uri=${credentials.redirect_uri}`, cb)
@@ -33,14 +34,8 @@ function get(path, cb) {
   const req = https.request(options, res => {
     res.on('data', chunk => data += chunk)
     res.on('end', () => {
-      if (res.statusCode === 401) {
-        refresh((err) => {
-          if (err) cb(err)
-          else get(path, cb)
-        })
-      } else {
-        cb(null, JSON.parse(data), null, 2)
-      }
+      if (res.statusCode !== 200) cb(data)
+      else cb(null, JSON.parse(data), null, 2)
     })
   })
   req.end()
@@ -77,32 +72,43 @@ function post(body, cb) {
 
 
 module.exports = {
-  getSleep: (dateString, cb) => {
-    get('/profile.json', (err, profile) => {
+  // First this
+  refreshToken: cb => {
+    refresh(err => {
       if (err) return cb(err)
-      get(`/sleep/date/${dateString}.json`, (err, sleepData) => {
+      get('/profile.json', (err, newProfile) => {
         if (err) return cb(err)
-        const sleepEvents = []
-        for (let i = 0; i < sleepData.sleep.length; i++) {
-          const start = new Date((new Date(sleepData.sleep[i].startTime)).getTime() - profile.user.offsetFromUTCMillis)
-          const end = new Date(start.getTime() + sleepData.sleep[i].timeInBed * 60000)
-          const totalDuration = (end.getTime() - start.getTime())
-          const totalHours = Math.floor(totalDuration / 3600000)
-          const totalMinutes = Math.round((totalDuration - totalHours * 3600000) / 60000)
-          const sleepDuration = sleepData.sleep[i].minutesAsleep * 60000
-          const sleepHours = Math.floor(sleepDuration / 3600000)
-          const sleepMinutes = Math.round((sleepDuration - sleepHours * 3600000) / 60000)
-          sleepEvents.push({
-            start: start,
-            end: end,
-            totalDuration: `${totalHours}h ${totalMinutes}m`,
-            sleepDuration: `${sleepHours}h ${sleepMinutes}m`
-          })
-        }
-        cb(null, sleepEvents)
+        profile = newProfile
+        cb()
       })
     })
   },
+  // Then this
+  getSleep: (dateString, cb) => {
+    get(`/sleep/date/${dateString}.json`, (err, sleepData) => {
+      if (err) return cb(err)
+        const sleepEvents = []
+      for (let i = 0; i < sleepData.sleep.length; i++) {
+        const start = new Date((new Date(sleepData.sleep[i].startTime)).getTime() - profile.user.offsetFromUTCMillis)
+        const end = new Date(start.getTime() + sleepData.sleep[i].timeInBed * 60000)
+        const totalDuration = (end.getTime() - start.getTime())
+        const totalHours = Math.floor(totalDuration / 3600000)
+        const totalMinutes = Math.round((totalDuration - totalHours * 3600000) / 60000)
+        const sleepDuration = sleepData.sleep[i].minutesAsleep * 60000
+        const sleepHours = Math.floor(sleepDuration / 3600000)
+        const sleepMinutes = Math.round((sleepDuration - sleepHours * 3600000) / 60000)
+        sleepEvents.push({
+          start: start,
+          end: end,
+          totalDuration: `${totalHours}h ${totalMinutes}m`,
+          sleepDuration: `${sleepHours}h ${sleepMinutes}m`
+        })
+      }
+      cb(null, sleepEvents)
+    })
+  },
+  // Start a small server through which user can authenticate.
+  // This is only required once, afterwards the access tokens are used.
   startServer: () => {
     https.createServer({
       key: fs.readFileSync(`${process.env.HOME}/.secrets/ssl/key.pem`),

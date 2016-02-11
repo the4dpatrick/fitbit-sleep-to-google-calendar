@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 const nodemailer = require('nodemailer')
-const getSleep = require('./fitbit-interface').getSleep
+const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
 
 
@@ -11,14 +11,18 @@ const thisrun = new Date()
 const date = new Date(lastrun)
 const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/google-calendar-ids.json`)).fitbit
 
-while (date < thisrun) {
-  console.log(`Fetching sleep from: ${date.toISOString().substr(0, 10)}`)
-  fitbitToGoogle(date.toISOString().substr(0, 10))
-  date.setDate(date.getDate() + 1)
-}
+
+fitbit.refreshToken(err => {
+  if (err) return errorHandler(err)
+  while (date < thisrun) {
+    console.log(`Fetching sleep from: ${date.toISOString().substr(0, 10)}`)
+    fitbitToGoogle(date.toISOString().substr(0, 10))
+    date.setDate(date.getDate() + 1)
+  }
+})
 
 function fitbitToGoogle(dateString) {
-  getSleep(dateString, (err, sleepEvents) => {
+  fitbit.getSleep(dateString, (err, sleepEvents) => {
     if (err) return errorHandler(err)
     let success = true
     for (let e of sleepEvents) {
@@ -59,7 +63,9 @@ const transporter = nodemailer.createTransport({
 })
 
 function log(msg) {
-  fs.appendFile(`${__dirname}/error.log`, `${(new Date()).toISOString()} ${msg}\n`)
+  msg = `${(new Date()).toISOString()} ${msg}`
+  console.log(msg)
+  fs.appendFile(`${__dirname}/error.log`, `${msg}\n`)
 }
 
 function sendmail(from, subject, text) {
