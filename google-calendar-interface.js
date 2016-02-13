@@ -74,21 +74,35 @@ function storeToken(token) {
 }
 
 
+const clientSecret = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/google-client-secret.json`))
+
 module.exports = {
   createEvent: (calendarId, summary, start, end, cb) => {
-    fs.readFile(`${process.env.HOME}/.secrets/google-client-secret.json`, (err, data) => {
-      if (err) return cb(err)
-      authorize(JSON.parse(data), (auth) => {
-        const calendar = google.calendar('v3');
-        calendar.events.insert({
-          auth: auth,
-          calendarId: calendarId,
-          resource: {
-            'summary': summary,
-            'start'  : { 'dateTime': start.toISOString() },
-            'end'    : { 'dateTime': end.toISOString() },
-          }
-        }, cb)
+    authorize(clientSecret, (auth) => {
+      const calendar = google.calendar('v3');
+      calendar.events.list({
+        auth: auth,
+        calendarId: calendarId,
+        timeMin: start.toISOString(),
+        timeMax: new Date(start.getTime() + 60*1000).toISOString(),
+        maxResults: 1,
+        singleEvents: true,
+        orderBy: 'startTime'
+      }, (err, response) => {
+        if (err) return cb(err)
+        if (response.items[0] && response.items[0].summary === summary) {
+          console.log(`Event exists: '${summary}' at ${start.toISOString()}–${end.toISOString()}`)
+        } else {
+          calendar.events.insert({
+            auth: auth,
+            calendarId: calendarId,
+            resource: {
+              'summary': summary,
+              'start': { 'dateTime': start.toISOString() },
+              'end': { 'dateTime': end.toISOString() },
+            }
+          }, cb)
+        }
       })
     })
   }

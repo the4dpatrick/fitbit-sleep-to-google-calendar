@@ -31,10 +31,10 @@ Start the server:
 node fitbit-sleep-to-google-calendar.js
 ```
 
-When it receives a posh notification, it pulls todays sleep data and creates a calendar event.
+When it receives a push notification, it pulls todays sleep data and creates a calendar event.
 
 
-### 'Manual' sleep log synchronization (no push notifications)
+### 'Manual' sleep log synchronization
 
 Create calendar events for all sleep events from `2015-12-31` to current date:
 
