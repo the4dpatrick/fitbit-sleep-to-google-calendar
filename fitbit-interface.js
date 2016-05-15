@@ -13,7 +13,7 @@ const https = require('https')
 const querystring = require('querystring')
 
 
-const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/fitbit-credentials.json`))
+const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/fitbit-credentials.json`))
 let profile
 
 
@@ -70,7 +70,7 @@ function requestToken(body, cb) {
       if (res.statusCode !== 200) return cb(data)
       credentials.access_token = data.access_token
       credentials.refresh_token = data.refresh_token
-      fs.writeFile(`${process.env.HOME}/.secrets/fitbit-credentials.json`, JSON.stringify(credentials, null, 2), cb)
+      fs.writeFile(`${process.env.HOME}/.credentials/fitbit-credentials.json`, JSON.stringify(credentials, null, 2), cb)
     })
   })
   req.on('error', err => cb(err))
@@ -155,8 +155,8 @@ module.exports = {
   startAuthServer: () => {
     // https://dev.fitbit.com/docs/oauth2/#obtaining-consent
     https.createServer({
-      key: fs.readFileSync(`${process.env.HOME}/.secrets/ssl/key.pem`),
-      cert: fs.readFileSync(`${process.env.HOME}/.secrets/ssl/cert.pem`)
+      key: fs.readFileSync(`${process.env.HOME}/.credentials/ssl/key.pem`),
+      cert: fs.readFileSync(`${process.env.HOME}/.credentials/ssl/cert.pem`)
     }, (req, res) => {
       if (req.url === '/auth/fitbit') {
         res.writeHead(302, { 'Location': `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=${credentials.client_id}&redirect_uri=${encodeURIComponent(credentials.redirect_uri)}&scope=sleep%20profile%20activity` }); res.end()

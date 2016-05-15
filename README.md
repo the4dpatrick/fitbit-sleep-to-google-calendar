@@ -28,7 +28,7 @@ and doing as it says. Access tokens have now been acquired with which the progra
 Start the server:
 
 ```
-node fitbit-sleep-to-google-calendar.js
+node server.js
 ```
 
 When it receives a push notification, it pulls todays sleep data and creates a calendar event.
@@ -39,7 +39,7 @@ When it receives a push notification, it pulls todays sleep data and creates a c
 Create calendar events for all sleep events from `2015-12-31` to current date:
 
 ```
-node fitbit-sleep-to-google-calendar.js 2015-12-31
+node server.js 2015-12-31
 ```
 
 *Duplicate events are never created.*

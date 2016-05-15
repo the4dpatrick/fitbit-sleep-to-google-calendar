@@ -4,7 +4,7 @@ const fs = require('fs')
 const nodemailer = require('nodemailer')
 const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
-const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/google-calendar-ids.json`)).fitbit
+const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/google-calendar-ids.json`)).fitbit
 
 
 // Run 'manual'
@@ -55,7 +55,7 @@ function fitbitToGoogle(dateString) {
 
 // Report errors by email and to error.log
 
-const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.secrets/credentials.json`))
+const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/credentials.json`))
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
