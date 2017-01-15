@@ -8,7 +8,7 @@ const google = require('googleapis')
 const googleAuth = require('google-auth-library')
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar']
-const TOKEN_PATH = `${process.env.HOME}/.credentials/google-credentials.json`
+const TOKEN_PATH = `${__dirname}/.credentials/google-credentials.json`
 
 
 /**
@@ -74,12 +74,14 @@ function storeToken(token) {
 }
 
 
-const clientSecret = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/google-client-secret.json`))
+const clientSecret = JSON.parse(fs.readFileSync(`${__dirname}/.credentials/google-client-secret.json`))
 
 module.exports = {
+  authorize,
   createEvent: (calendarId, summary, start, end, cb) => {
     authorize(clientSecret, (auth) => {
       const calendar = google.calendar('v3');
+      // TODO: delete placeholder sleep event
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,

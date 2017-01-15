@@ -13,7 +13,7 @@ const https = require('https')
 const querystring = require('querystring')
 
 
-const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/fitbit-credentials.json`))
+const credentials = JSON.parse(fs.readFileSync(`${__dirname}/.credentials/fitbit-credentials.json`))
 let profile
 
 
@@ -70,7 +70,7 @@ function requestToken(body, cb) {
       if (res.statusCode !== 200) return cb(data)
       credentials.access_token = data.access_token
       credentials.refresh_token = data.refresh_token
-      fs.writeFile(`${process.env.HOME}/.credentials/fitbit-credentials.json`, JSON.stringify(credentials, null, 2), cb)
+      fs.writeFile(`${__dirname}/.credentials/fitbit-credentials.json`, JSON.stringify(credentials, null, 2), cb)
     })
   })
   req.on('error', err => cb(err))
@@ -197,11 +197,22 @@ module.exports = {
         // Since we only have one subscription, we don't have to look at the request body to know what notification this is
         cb()
       }
-    }).listen(3001)
+    }).listen(8080)
+  },
+  initSubscription: () => {
+    const subscriptionId = 1
+    refresh((err) => {
+      if (err) return console.log(err)
+      // This appears to be an idempotent request
+      addSubscription(`/sleep/apiSubscriptions/${subscriptionId}.json`, () => console.log('done'))
+      // List active subscriptions
+      // get(`/sleep/apiSubscriptions.json`, cb)
+    })
   }
 }
 
 
 if (require.main === module) {
   module.exports.startAuthServer()
+  // module.exports.initSubscription()
 }

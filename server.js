@@ -1,10 +1,10 @@
 'use strict'
 
 const fs = require('fs')
-const nodemailer = require('nodemailer')
+// const nodemailer = require('nodemailer')
 const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
-const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/google-calendar-ids.json`)).fitbit
+const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/google-calendar-ids.json`)).sleep
 
 
 // Run 'manual'
@@ -55,17 +55,17 @@ function fitbitToGoogle(dateString) {
 
 // Report errors by email and to error.log
 
-const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/credentials.json`))
+// const credentials = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/credentials.json`))
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: credentials.gmailNotifier.user,
-    pass: credentials.gmailNotifier.pass
-  }
-})
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp.gmail.com',
+//   port: 465,
+//   secure: true,
+//   auth: {
+//     user: credentials.gmailNotifier.user,
+//     pass: credentials.gmailNotifier.pass
+//   }
+// })
 
 function log(msg) {
   msg = `${(new Date()).toISOString()} ${msg}`
@@ -73,19 +73,19 @@ function log(msg) {
   fs.appendFile(`${__dirname}/error.log`, `${msg}\n`)
 }
 
-function sendmail(from, subject, text) {
-  transporter.sendMail({
-    from: `${from} <${credentials.gmailNotifier.user}>`,
-    to: credentials.gmail.user,
-    subject: subject,
-    text: text,
-  }, err => {
-    if (err) log(`SENDMAIL ERROR: ${JSON.stringify(err, null, 2)}`)
-  })
-}
+// function sendmail(from, subject, text) {
+//   transporter.sendMail({
+//     from: `${from} <${credentials.gmailNotifier.user}>`,
+//     to: credentials.gmail.user,
+//     subject: subject,
+//     text: text,
+//   }, err => {
+//     if (err) log(`SENDMAIL ERROR: ${JSON.stringify(err, null, 2)}`)
+//   })
+// }
 
 function errorHandler(err, cb) {
   if (!err) return
   log(`ERROR: ${JSON.stringify(err, null, 2)}`)
-  sendmail('Fitbit sleep log', 'Error', JSON.stringify(err, null, 2))
+  // sendmail('Fitbit sleep log', 'Error', JSON.stringify(err, null, 2))
 }
