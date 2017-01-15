@@ -4,7 +4,8 @@ const fs = require('fs')
 // const nodemailer = require('nodemailer')
 const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
-const calendarId = JSON.parse(fs.readFileSync(`${process.env.HOME}/.credentials/google-calendar-ids.json`)).sleep
+const calendarId = JSON.parse(fs.readFileSync(`${__dirname}/.credentials/google-calendar-ids.json`)).sleep
+const moment = require('moment')
 
 
 // Run 'manual'
@@ -27,7 +28,7 @@ else {
     fitbit.refreshToken(err => {
       if (err) return errorHandler(err)
       console.log(`Fetching sleep events from today`)
-      fitbitToGoogle(new Date().toISOString().substr(0, 10))
+      fitbitToGoogle(moment().format().substr(0,10))
     })
   })
   console.log('Listening for sleep event push notifications')
