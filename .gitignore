@@ -1,3 +1,7 @@
 node_modules
 lastrun.date
 error.log
+.credentials/fitbit-credentials.json
+.credentials/google-calendar-ids.json
+.credentials/google-client-secret.json
+.credentials/google-credentials.json
