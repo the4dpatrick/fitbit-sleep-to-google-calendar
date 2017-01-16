@@ -36,10 +36,14 @@ When it receives a push notification, it pulls todays sleep data and creates a c
 
 ### 'Manual' sleep log synchronization
 
-Create calendar events for all sleep events from `2015-12-31` to current date:
+Create calendar events for all sleep events from `2015-12-31` to current date or a until a defined date:
 
 ```
 node server.js 2015-12-31
+```
+
+```
+node server.js 2015-12-31 2016-12-31
 ```
 
 *Duplicate events are never created.*

@@ -10,14 +10,18 @@ const moment = require('moment')
 
 // Run 'manual'
 if (process.argv[2]) {
+
+  const userDefinedEndDate = new Date(process.argv[3])
   const now = new Date()
-  let date = new Date(process.argv[2])
+  const endDate = userDefinedEndDate || now
+  let startDate = new Date(process.argv[2])
+
   fitbit.refreshToken(err => {
     if (err) return errorHandler(err)
-    while (date < now) {
-      console.log(`Fetching sleep event from: ${date.toISOString().substr(0, 10)}`)
-      fitbitToGoogle(date.toISOString().substr(0, 10))
-      date.setDate(date.getDate() + 1)
+    while (startDate < endDate) {
+      console.log(`Fetching sleep event from: ${startDate.toISOString().substr(0, 10)}`)
+      fitbitToGoogle(startDate.toISOString().substr(0, 10))
+      startDate.setDate(startDate.getDate() + 1)
     }
   })
 }
