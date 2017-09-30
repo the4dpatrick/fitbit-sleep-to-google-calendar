@@ -81,7 +81,47 @@ module.exports = {
   createEvent: (calendarId, summary, start, end, cb) => {
     authorize(clientSecret, (auth) => {
       const calendar = google.calendar('v3');
-      // TODO: delete placeholder sleep event
+
+      // Delete placeholder sleep event
+
+      // Depending on time zone, tomorrow's calendar event may be found instead of todays
+      // Select the correct one i.e. yesterday's
+      const date = (new Date()) // Today
+      date.setDate(date.getDate() - 1) // Yesterday
+
+      calendar.events.list({
+        auth: auth,
+        calendarId: calendarId,
+        timeMin: date.toISOString(),
+        maxResults: 1,
+        singleEvents: true,
+        orderBy: 'startTime'
+      }, function(err, response) {
+        if (err) {
+          console.log('The API returned an error: ' + err);
+          return;
+        }
+        var events = response.items;
+        if (events.length == 0) {
+          console.log('No "Sleep" event found.');
+        } else {
+          var event = events[0]
+          calendar.events.delete({
+            auth: auth,
+            calendarId: calendarId,
+            eventId: event.id
+          }, (err, res) => {
+            if (err) {
+              console.log('The API returned an error: ' + err);
+            }
+            var start = event.start.dateTime || event.start.date;
+            console.log('Deleted %s "Sleep" event', start)
+          })
+        }
+      });
+
+
+      // Create tracked sleep event
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,
