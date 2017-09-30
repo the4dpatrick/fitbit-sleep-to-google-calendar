@@ -32,7 +32,7 @@ node server.js
 ```
 
 When it receives a push notification, it pulls todays sleep data and creates a calendar event.
-
+In addition to creating a new calendar event, it deletes a placeholder sleep calendar event.
 
 ### 'Manual' sleep log synchronization
 
