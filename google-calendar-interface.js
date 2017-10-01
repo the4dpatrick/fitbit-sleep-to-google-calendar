@@ -84,7 +84,8 @@ module.exports = {
 
       // Delete placeholder sleep event
       const today = new Date();
-      let tomorrow = (new Date()).setDate(today.getDate());
+      let tomorrow = new Date();
+      tomorrow.setDate(today.getDate());
 
       calendar.events.list({
         auth: auth,
