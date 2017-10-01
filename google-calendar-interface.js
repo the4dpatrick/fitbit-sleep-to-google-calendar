@@ -83,14 +83,14 @@ module.exports = {
       const calendar = google.calendar('v3');
 
       // Delete placeholder sleep event
-      const today = new Date().toISOString();
-      let tomorrow = (new Date()).setDate(today.getDate()).toISOString();
+      const today = new Date();
+      let tomorrow = (new Date()).setDate(today.getDate());
 
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,
-        timeMin: today,
-        timeMax: tomorrow,
+        timeMin: today.toISOString(),
+        timeMax: tomorrow.toISOString(),
         maxResults: 1,
         singleEvents: true,
         orderBy: 'startTime'
