@@ -93,6 +93,7 @@ module.exports = {
         auth: auth,
         calendarId: calendarId,
         timeMin: date.toISOString(),
+        timeMax: date.toISOString(),
         maxResults: 1,
         singleEvents: true,
         orderBy: 'startTime'
