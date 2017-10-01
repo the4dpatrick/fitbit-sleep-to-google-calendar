@@ -86,8 +86,8 @@ module.exports = {
 
       // Depending on time zone, tomorrow's calendar event may be found instead of todays
       // Select the correct one i.e. yesterday's
-      const date = (new Date()) // Today
-      date.setDate(date.getDate() - 1) // Yesterday
+      const date = new Date() // Today
+      // date.setDate(date.getDate() - 1) // Yesterday
 
       calendar.events.list({
         auth: auth,
@@ -105,18 +105,22 @@ module.exports = {
         if (events.length == 0) {
           console.log('No "Sleep" event found.');
         } else {
-          var event = events[0]
-          calendar.events.delete({
-            auth: auth,
-            calendarId: calendarId,
-            eventId: event.id
-          }, (err, res) => {
-            if (err) {
-              console.log('The API returned an error: ' + err);
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+            if (event && event.summary === 'Sleep') {
+              calendar.events.delete({
+                auth: auth,
+                calendarId: calendarId,
+                eventId: event.id
+              }, (err, res) => {
+                if (err) {
+                  console.log('The API returned an error: ' + err);
+                }
+                var start = event.start.dateTime || event.start.date;
+                console.log('Deleted %s - %s event', start, event.summary);
+              });
             }
-            var start = event.start.dateTime || event.start.date;
-            console.log('Deleted %s "Sleep" event', start)
-          })
+          }
         }
       });
 
