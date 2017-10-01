@@ -83,17 +83,14 @@ module.exports = {
       const calendar = google.calendar('v3');
 
       // Delete placeholder sleep event
-
-      // Depending on time zone, tomorrow's calendar event may be found instead of todays
-      // Select the correct one i.e. yesterday's
-      const date = new Date() // Today
-      // date.setDate(date.getDate() - 1) // Yesterday
+      const today = new Date().toISOString();
+      let tomorrow = (new Date()).setDate(today.getDate()).toISOString();
 
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,
-        timeMin: date.toISOString(),
-        timeMax: date.toISOString(),
+        timeMin: today,
+        timeMax: tomorrow,
         maxResults: 1,
         singleEvents: true,
         orderBy: 'startTime'
