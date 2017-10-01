@@ -84,14 +84,14 @@ module.exports = {
 
       // Delete placeholder sleep event
       const today = new Date();
-      let tomorrow = new Date();
-      tomorrow.setDate(today.getDate() + 1);
+      let evening = new Date();
+      evening.setHours(19); // Next day Sleep event starts at 2000
 
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,
         timeMin: today.toISOString(),
-        timeMax: tomorrow.toISOString(),
+        timeMax: evening.toISOString(),
         maxResults: 1,
         singleEvents: true,
         orderBy: 'startTime'
