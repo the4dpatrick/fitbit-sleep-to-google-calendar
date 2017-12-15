@@ -5,7 +5,7 @@ const fs = require('fs')
 const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
 const calendarId = JSON.parse(fs.readFileSync(`${__dirname}/.credentials/google-calendar-ids.json`)).sleep
-const moment = require('moment-zone')
+const moment = require('moment-timezone')
 
 const TIMEZONE = process.env.TIMEZONE || moment.tz.guess()
 
