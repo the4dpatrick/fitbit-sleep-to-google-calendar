@@ -5,8 +5,9 @@ const fs = require('fs')
 const fitbit = require('./fitbit-interface')
 const createEvent = require('./google-calendar-interface').createEvent
 const calendarId = JSON.parse(fs.readFileSync(`${__dirname}/.credentials/google-calendar-ids.json`)).sleep
-const moment = require('moment')
+const moment = require('moment-zone')
 
+const TIMEZONE = process.env.TIMEZONE || moment.tz.guess()
 
 // Run 'manual'
 if (process.argv[2]) {
@@ -32,7 +33,7 @@ else {
     fitbit.refreshToken(err => {
       if (err) return errorHandler(err)
       console.log(`Fetching sleep events from today`)
-      fitbitToGoogle(moment().format().substr(0,10))
+      fitbitToGoogle(dateNow().substr(0,10))
     })
   })
   console.log('Listening for sleep event push notifications')
@@ -73,7 +74,7 @@ function fitbitToGoogle(dateString) {
 // })
 
 function log(msg) {
-  msg = `${(new Date()).toISOString()} ${msg}`
+  msg = `${dateNow()} ${msg}`
   console.log(msg)
   fs.appendFile(`${__dirname}/error.log`, `${msg}\n`)
 }
@@ -93,4 +94,8 @@ function errorHandler(err, cb) {
   if (!err) return
   log(`ERROR: ${JSON.stringify(err, null, 2)}`)
   // sendmail('Fitbit sleep log', 'Error', JSON.stringify(err, null, 2))
+}
+
+function dateNow() {
+  return moment().tz().format()
 }
