@@ -44,6 +44,9 @@ function fitbitToGoogle(dateString) {
   fitbit.getSleep(dateString, (err, sleepEvents) => {
     if (err) return errorHandler(err)
     let success = true
+
+    if (!sleepEvents.length) return console.log('No sleep events found for today')
+
     for (let e of sleepEvents) {
       createEvent(calendarId, `(${e.totalDuration}) <${e.sleepDuration}>`, e.start, e.end, err => {
         if (err) {
