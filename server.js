@@ -100,5 +100,5 @@ function errorHandler(err, cb) {
 }
 
 function dateNow() {
-  return moment().tz().format()
+  return moment.tz().format()
 }
