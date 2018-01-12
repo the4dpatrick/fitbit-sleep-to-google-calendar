@@ -83,14 +83,16 @@ module.exports = {
       const calendar = google.calendar('v3');
 
       // Delete placeholder sleep event
-      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
       let evening = new Date();
       evening.setHours(19); // Next day Sleep event starts at 2000
 
       calendar.events.list({
         auth: auth,
         calendarId: calendarId,
-        timeMin: today.toISOString(),
+        timeMin: yesterday.toISOString(),
         timeMax: evening.toISOString(),
         maxResults: 1,
         singleEvents: true,
