@@ -11,11 +11,12 @@ const TIMEZONE = process.env.TIMEZONE || moment.tz.guess()
 
 // Run 'manual'
 if (process.argv[2]) {
+  const startDate = new Date(process.argv[2])
 
-  const userDefinedEndDate = new Date(process.argv[3])
-  const now = new Date()
-  const endDate = userDefinedEndDate || now
-  let startDate = new Date(process.argv[2])
+  let endDate = new Date()
+  if (process.argv[3]) {
+    endDate = new Date(process.argv[3])
+  }
 
   fitbit.refreshToken(err => {
     if (err) return errorHandler(err)
